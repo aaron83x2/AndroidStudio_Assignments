@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Le laboratoire Android d\'Aaron</string>
+    <string name="app_name">Aaron\'s Android Lab</string>
     <string name="button_message">Je suis un bouton</string>
     <string name="hello_message">Bonjour le monde</string>
 </resources>
