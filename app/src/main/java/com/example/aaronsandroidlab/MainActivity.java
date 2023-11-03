@@ -38,12 +38,10 @@ public class MainActivity extends AppCompatActivity {
             checkPasswordComplexity(password);
         });
 
-
     }
 
     /**
      * This function validates the password field after logging in
-     *
      * @param pw The string object that we are checking
      * @return Returns if true
      */
@@ -69,21 +67,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(!foundUpperCase) {
-            Toast.makeText(getApplicationContext(), "Missing Uppercase", Toast.LENGTH_SHORT) ;
+            Toast.makeText(this, "Missing Uppercase", Toast.LENGTH_SHORT).show() ;
+            view.setText("You shall not pass !");
             return false;
         } else if(!foundLowerCase){
-            Toast.makeText(getApplicationContext(), "Missing Lowercase", Toast.LENGTH_SHORT) ;
+            Toast.makeText(getApplicationContext(), "Missing Lowercase", Toast.LENGTH_SHORT).show();
+            view.setText("You shall not pass !");
             return false;
         } else if(!foundNumber){
-            Toast.makeText(getApplicationContext(), "Missing Number", Toast.LENGTH_SHORT);
+            Toast.makeText(getApplicationContext(), "Missing Number", Toast.LENGTH_SHORT).show();
+            view.setText("You shall not pass !");
             return false;
-        }
-
-        else if(!foundSpecial){
-            Toast.makeText(getApplicationContext(), "Missing Special Character", Toast.LENGTH_SHORT);
+        } else if(!foundSpecial){
+            Toast.makeText(getApplicationContext(), "Missing Special Character", Toast.LENGTH_SHORT).show();
+            view.setText("You shall not pass !");
             return false;
+        }else if(foundLowerCase && foundLowerCase && foundNumber && foundSpecial){
+            view.setText("Your password is complex enough");
         }
-
         return false;
 
     }
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Function used to check if passowrd has a special character
-     * @param c Characetrs
+     * @param c Characters
      * @return
      */
     boolean isSpecialCharacter(char c){
