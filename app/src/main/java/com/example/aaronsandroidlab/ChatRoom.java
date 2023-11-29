@@ -29,7 +29,7 @@ public class ChatRoom extends AppCompatActivity {
 
     ArrayList<ChatMessage> messages = new ArrayList<>();
 
-    ChatRoomViewModel chatModel;
+    ChatRoomViewModel  chatModel;
 
     ChatMessageDAO mDAO;
 
@@ -52,9 +52,11 @@ public class ChatRoom extends AppCompatActivity {
         if (messages == null) {
             chatModel.messages.postValue(messages = new ArrayList<>());
 
+            //Build Database
             MessageDatabase db = Room.databaseBuilder(getApplicationContext(), MessageDatabase.class, "ChatMessage").build();
             mDAO = db.cmDAO();
 
+            //Get All Entries from database
             Executor thread = Executors.newSingleThreadExecutor();
             thread.execute( () -> {
 
@@ -77,9 +79,7 @@ public class ChatRoom extends AppCompatActivity {
 
         });
 
-
-
-
+        //If Sender is clicked
         binding.sendButton.setOnClickListener(click -> {
             //Get Text from input
             String msg = binding.textInput.getText().toString();
@@ -103,6 +103,7 @@ public class ChatRoom extends AppCompatActivity {
 
         });
 
+        //If Receiver is Clicked
         binding.recieveButton.setOnClickListener(click -> {
             //Get Text from input
             String msg = binding.textInput.getText().toString();
@@ -169,11 +170,6 @@ public class ChatRoom extends AppCompatActivity {
             }
 
         });
-
-
-
-
-
 
         //Initialize the chat room model object
         binding.recycleView.setLayoutManager(new LinearLayoutManager(this));
