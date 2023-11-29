@@ -4,12 +4,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -66,6 +63,19 @@ public class ChatRoom extends AppCompatActivity {
 
             });
         }
+
+        chatModel.selectedMessage.observe(this, (newMsgValue) -> {
+
+
+            MessageDetailsFragment chatFragment = new MessageDetailsFragment( newMsgValue );
+
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentLocation, chatFragment)
+                    .addToBackStack("")
+                    .commit();
+
+        });
 
 
 
@@ -161,24 +171,11 @@ public class ChatRoom extends AppCompatActivity {
         });
 
 
-        chatModel.selectedMessage.observe(this, (newMsgValue) -> {
-//            FragmentManager fm = getSupportFragmentManager();
-//            FragmentTransaction tx = fm.beginTransaction();
-
-//            MessageDetailsFragment chatFragment = new MessageDetailsFragment(newMessageValue);
-            MessageDetailsFragment chatFragment = new MessageDetailsFragment( newMsgValue );  //newValue is the newly set ChatMessage
-            FragmentManager fMgr = getSupportFragmentManager();
-
-            FragmentTransaction tx = fMgr.beginTransaction();
-            tx.add(R.id.fragmentLocation, chatFragment);
-            tx.commit();
-
-
-        });
 
 
 
-        //Initialize the chat room model objectnby
+
+        //Initialize the chat room model object
         binding.recycleView.setLayoutManager(new LinearLayoutManager(this));
 
 
@@ -199,11 +196,6 @@ public class ChatRoom extends AppCompatActivity {
                 ChatMessage selected = messages.get(position);
 
                 chatModel.selectedMessage.postValue(selected);
-
-                Toast.makeText(ChatRoom.this, "Clicked", Toast.LENGTH_SHORT).show();
-
-
-
 
 
 //                AlertDialog.Builder builder = new AlertDialog.Builder( ChatRoom.this );
@@ -235,10 +227,7 @@ public class ChatRoom extends AppCompatActivity {
 //                                    .show();
 //
 //                    }).create().show();
-
             });
-
-
 
             messageText = itemView.findViewById(R.id.message);
             timeText = itemView.findViewById(R.id.time);
