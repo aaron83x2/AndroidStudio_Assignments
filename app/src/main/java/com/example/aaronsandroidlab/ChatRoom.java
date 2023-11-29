@@ -1,13 +1,15 @@
 package com.example.aaronsandroidlab;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +18,6 @@ import androidx.room.Room;
 import com.example.aaronsandroidlab.databinding.ActivityChatRoomBinding;
 import com.example.aaronsandroidlab.databinding.RecieveMessageBinding;
 import com.example.aaronsandroidlab.databinding.SendMessageBinding;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -160,6 +161,22 @@ public class ChatRoom extends AppCompatActivity {
         });
 
 
+        chatModel.selectedMessage.observe(this, (newMsgValue) -> {
+//            FragmentManager fm = getSupportFragmentManager();
+//            FragmentTransaction tx = fm.beginTransaction();
+
+//            MessageDetailsFragment chatFragment = new MessageDetailsFragment(newMessageValue);
+            MessageDetailsFragment chatFragment = new MessageDetailsFragment( newMsgValue );  //newValue is the newly set ChatMessage
+            FragmentManager fMgr = getSupportFragmentManager();
+
+            FragmentTransaction tx = fMgr.beginTransaction();
+            tx.add(R.id.fragmentLocation, chatFragment);
+            tx.commit();
+
+
+        });
+
+
 
         //Initialize the chat room model objectnby
         binding.recycleView.setLayoutManager(new LinearLayoutManager(this));
@@ -179,36 +196,45 @@ public class ChatRoom extends AppCompatActivity {
 
             itemView.setOnClickListener(click -> {
                 int position = getAbsoluteAdapterPosition();
+                ChatMessage selected = messages.get(position);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder( ChatRoom.this );
-                builder.setMessage("Do you want to delete the message " + messageText.getText())
-                        .setTitle("Question:")
-                        .setNegativeButton("No", (Dialog, Click) -> {})
-                        .setPositiveButton("Yes", (Dialog, Click) ->{
+                chatModel.selectedMessage.postValue(selected);
 
-                            ChatMessage removedMessage = messages.get(position);
-
-                                Executor thread2 = Executors.newSingleThreadExecutor();
-                                        thread2.execute(() -> {
-                                        //delete from database
-                                        mDAO.deleteMessages(removedMessage);
-                                });
-
-                                messages.remove(position);
-                                myAdapter.notifyItemRemoved(position);
-
-
-                                Snackbar.make(messageText, "You deleted message #" + position, Snackbar.LENGTH_LONG)
-                                    .setAction("Undo", clk ->{
+                Toast.makeText(ChatRoom.this, "Clicked", Toast.LENGTH_SHORT).show();
 
 
 
-                                        messages.add(position, removedMessage);
-                                        myAdapter.notifyItemRemoved(position);
-                                    })
-                                    .show();
 
-                    }).create().show();
+
+//                AlertDialog.Builder builder = new AlertDialog.Builder( ChatRoom.this );
+//                builder.setMessage("Do you want to delete the message " + messageText.getText())
+//                        .setTitle("Question:")
+//                        .setNegativeButton("No", (Dialog, Click) -> {})
+//                        .setPositiveButton("Yes", (Dialog, Click) ->{
+//
+//                            ChatMessage removedMessage = messages.get(position);
+//
+//                                Executor thread2 = Executors.newSingleThreadExecutor();
+//                                        thread2.execute(() -> {
+//                                        //delete from database
+//                                        mDAO.deleteMessages(removedMessage);
+//                                });
+//
+//                                messages.remove(position);
+//                                myAdapter.notifyItemRemoved(position);
+//
+//
+//                                Snackbar.make(messageText, "You deleted message #" + position, Snackbar.LENGTH_LONG)
+//                                    .setAction("Undo", clk ->{
+//
+//
+//
+//                                        messages.add(position, removedMessage);
+//                                        myAdapter.notifyItemRemoved(position);
+//                                    })
+//                                    .show();
+//
+//                    }).create().show();
 
             });
 
