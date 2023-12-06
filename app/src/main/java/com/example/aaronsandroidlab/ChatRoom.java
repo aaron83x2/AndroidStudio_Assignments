@@ -51,7 +51,7 @@ public class ChatRoom extends AppCompatActivity {
 
 
         if(selection == R.id.delete){
-            Toast.makeText(this, "Delete Clicked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Message Deleted", Toast.LENGTH_SHORT).show();
 
             // Get the selected message from the ViewModel
             ChatMessage selectedMessage = chatModel.selectedMessage.getValue();
@@ -67,15 +67,29 @@ public class ChatRoom extends AppCompatActivity {
 
                             // Delete the message from the list and notify the adapter
                             int position = messages.indexOf(selectedMessage);
-                            messages.remove(selectedMessage);
-                            myAdapter.notifyItemRemoved(position);
+
 
                             // Delete the message from the database
                             Executor thread2 = Executors.newSingleThreadExecutor();
-                            thread2.execute(() -> mDAO.deleteMessages(selectedMessage));
+
+                            thread2.execute(() -> {
+                                mDAO.deleteMessages(selectedMessage);
+
+
+                            });
+                            messages.remove(selectedMessage);
+                            myAdapter.notifyItemRemoved(position);
 
                             Snackbar.make(binding.getRoot(), "You deleted the message", Snackbar.LENGTH_LONG)
                                     .setAction("Undo", view -> {
+
+                                        Executor thread = Executors.newSingleThreadExecutor();
+
+
+                                        thread.execute(() ->{
+                                            mDAO.insertMessage(selectedMessage);
+                                        });
+
                                         messages.add(position, selectedMessage);
                                         myAdapter.notifyItemInserted(position);
                                     })
@@ -83,8 +97,13 @@ public class ChatRoom extends AppCompatActivity {
                         })
                         .create().show();
 
+            } else {
+                Toast.makeText(this, "No Message Selected", Toast.LENGTH_SHORT).show();
             }
-        } else if(selection == R.id.about){
+        }
+
+
+        if(selection == R.id.about){
             Toast.makeText(this, "Version 1.0, created by Aaron Odartei", Toast.LENGTH_SHORT).show();
         }
 
@@ -137,6 +156,7 @@ public class ChatRoom extends AppCompatActivity {
             });
         }
 
+        //Create Details Fragment
         chatModel.selectedMessage.observe(this, (newMsgValue) -> {
 
 
