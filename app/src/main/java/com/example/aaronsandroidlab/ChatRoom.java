@@ -1,12 +1,17 @@
 package com.example.aaronsandroidlab;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +20,7 @@ import androidx.room.Room;
 import com.example.aaronsandroidlab.databinding.ActivityChatRoomBinding;
 import com.example.aaronsandroidlab.databinding.RecieveMessageBinding;
 import com.example.aaronsandroidlab.databinding.SendMessageBinding;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,11 +44,76 @@ public class ChatRoom extends AppCompatActivity {
 
 
     @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+
+        int selection = item.getItemId();
+
+
+        if(selection == R.id.delete){
+            Toast.makeText(this, "Delete Clicked", Toast.LENGTH_SHORT).show();
+
+            // Get the selected message from the ViewModel
+            ChatMessage selectedMessage = chatModel.selectedMessage.getValue();
+
+            // Check if a message is selected
+            if (selectedMessage != null) {
+
+                new AlertDialog.Builder(ChatRoom.this)
+                        .setMessage("Do you want to delete the message " + selectedMessage.getMessage())
+                        .setTitle("Question:")
+                        .setNegativeButton("No", (dialog, which) -> {})
+                        .setPositiveButton("Yes", (dialog, which) -> {
+
+                            // Delete the message from the list and notify the adapter
+                            int position = messages.indexOf(selectedMessage);
+                            messages.remove(selectedMessage);
+                            myAdapter.notifyItemRemoved(position);
+
+                            // Delete the message from the database
+                            Executor thread2 = Executors.newSingleThreadExecutor();
+                            thread2.execute(() -> mDAO.deleteMessages(selectedMessage));
+
+                            Snackbar.make(binding.getRoot(), "You deleted the message", Snackbar.LENGTH_LONG)
+                                    .setAction("Undo", view -> {
+                                        messages.add(position, selectedMessage);
+                                        myAdapter.notifyItemInserted(position);
+                                    })
+                                    .show();
+                        })
+                        .create().show();
+
+            }
+        } else if(selection == R.id.about){
+            Toast.makeText(this, "Version 1.0, created by Aaron Odartei", Toast.LENGTH_SHORT).show();
+        }
+
+
+                //put your ChatMessage deletion code here. If you select this item, you should show the alert dialog
+                //asking if the user wants to delete this message.
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.mymenu, menu);
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         binding = ActivityChatRoomBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        //Create Toolbar
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+
+
+
+
 
         //Retrieve the arrayList<>
         chatModel = new ViewModelProvider(this).get(ChatRoomViewModel.class);
@@ -188,6 +259,7 @@ public class ChatRoom extends AppCompatActivity {
             super(itemView);
 
             itemView.setOnClickListener(click -> {
+
                 int position = getAbsoluteAdapterPosition();
                 ChatMessage selected = messages.get(position);
 
@@ -214,9 +286,6 @@ public class ChatRoom extends AppCompatActivity {
 //
 //                                Snackbar.make(messageText, "You deleted message #" + position, Snackbar.LENGTH_LONG)
 //                                    .setAction("Undo", clk ->{
-//
-//
-//
 //                                        messages.add(position, removedMessage);
 //                                        myAdapter.notifyItemRemoved(position);
 //                                    })

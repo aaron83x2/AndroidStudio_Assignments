@@ -4,7 +4,7 @@
 
 
         <!-- Primary brand color-->
-        <item name="colorPrimary">@color/my_primary</item>
+        <item name="colorPrimary">#8D449EEC</item>
 
         <!-- Secondary brand color-->
         <item name="colorSecondary">@color/my_secondary</item>
@@ -14,6 +14,12 @@
 
         <!--Text Color-->
         <item name="android:textColor">@color/my_text</item>
+
+        <!--Telling android not to use Action Bar-->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+
     </style>
 
     <style name="Theme.AaronsAndroidLab" parent="Base.Theme.AaronsAndroidLab" />
